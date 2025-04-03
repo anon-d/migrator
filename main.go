@@ -51,25 +51,27 @@ func connect(driver, dsn string) (*sql.DB, error) {
 
 func main() {
 
+	log.Print("Init config...")
 	cfg, err := config.MustLoad()
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("Error: %+v", err)
 	}
-	log.Print("Init config: complete")
 
+	log.Print("Init database...")
 	db, err := New("pgx", cfg.DBUrl)
 	if err != nil {
 		log.Printf("Error: %v", err)
 		os.Exit(1)
 	}
-	log.Print("Init database: complete")
 
 	defer db.Close()
 	if err := db.Ping(); err != nil {
+		log.Fatal("База данных не отвечает")
 		os.Exit(1)
 	}
 
-	command := flag.String("command", "up", "команда миграции (up, down, status)")
+	step := flag.Int("step", 1, "шаг миграции")
+	command := flag.String("command", "up", "команда миграции (up, down, upto, downto, status)")
 	flag.Parse()
 	goose.SetDialect(cfg.Driver)
 	log.Print("Set goose dialect: complete")
@@ -80,10 +82,14 @@ func main() {
 		out = goose.Up(db.DB, "./migrations")
 	case "down":
 		out = goose.Down(db.DB, "./migrations")
+	case "upto":
+		out = goose.UpTo(db.DB, "./migrations", int64(*step))
+	case "downto":
+		out = goose.DownTo(db.DB, "./migrations", int64(*step))
 	case "status":
 		out = goose.Status(db.DB, "./migrations")
 	default:
-		os.Exit(1)
+		log.Fatal("Неверная команда")
 	}
 	log.Printf("%v", out)
 	log.Print("Migration complete")
