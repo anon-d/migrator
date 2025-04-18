@@ -5,9 +5,9 @@ SELECT
 
 -- +goose StatementEnd
 INSERT INTO
-    apps (name, secret)
+    apps (name)
 VALUES
-    ('gateway', 'my_secret');
+    ('gateway');
 
 -- +goose Down
 -- +goose StatementBegin

@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- CREATE UNIQUE INDEX idx_users_email_unique ON users (uuid);
 CREATE TABLE IF NOT EXISTS apps (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(128) NOT NULL UNIQUE,
-    secret VARCHAR(64) NOT NULL
+    name VARCHAR(128) NOT NULL UNIQUE
 );
 
 -- +goose StatementEnd
